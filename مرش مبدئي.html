@@ -1,0 +1,371 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>المرش - نظام الإدخال والإدارة</title>
+  <link rel="icon" type="image/x-icon" href="logo.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --brand1:#ff9800; --brand2:#e65100; --bg:#f9f7f3; --text:#222;
+      --card:#ffffff; --muted:#eee; --border:#ddd; --ok:#4caf50; --warn:#e53935; --info:#2196f3;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    nav{display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#fff;padding:12px 18px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    nav img{width:40px;height:40px;border-radius:8px;background:#fff;padding:2px}
+    nav .title{font-weight:bold;font-size:20px}
+    .container{padding:18px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
+    .tab{border:none;border-radius:10px;padding:10px 14px;background:#fff;color:#333;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .tab.active{background:var(--brand1);color:#fff}
+    .section{display:none}
+    .section.active{display:block}
+    h2{margin:18px 0;color:var(--brand2);border-right:5px solid var(--brand1);padding-right:8px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:14px;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{border:1px solid var(--border);padding:10px;text-align:center}
+    th{background:#ffe0b2}
+    input[type="number"]{width:90px;padding:6px;text-align:center;border:1px solid #aaa;border-radius:8px;background:#fafafa}
+    .btn{border:none;border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:bold;box-shadow:0 1px 4px rgba(0,0,0,.1);transition:.2s}
+    .btn:hover{transform:scale(1.03)}
+    .btn.save{background:var(--ok);color:#fff}
+    .btn.refresh{background:var(--info);color:#fff}
+    .btn.close{background:var(--warn);color:#fff}
+    .btn.print{background:#6d4c41;color:#fff}
+    .grid{display:grid;gap:12px}
+    @media(min-width:900px){.grid.cols-2{grid-template-columns:1fr 1fr}}
+    .kpi{display:flex;gap:12px;flex-wrap:wrap}
+    .kpi .pill{background:#fff7e6;border:1px solid #ffd699;border-radius:999px;padding:8px 12px}
+    .flex{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .low{background:#ffe5e5}
+    .diff-ok{background:#e8f5e9}
+    .diff-bad{background:#fff3cd}
+    .muted{color:#666}
+    .filters input,.filters select{padding:8px;border:1px solid #bbb;border-radius:8px;background:#fff}
+  </style>
+</head>
+<body>
+
+  <nav>
+    <img src="logo.ico" alt="شعار المرش">
+    <div class="title">المرش — نظام الإدخال والإدارة</div>
+  </nav>
+
+  <div class="container">
+    <!-- أزرار التبديل -->
+    <div class="tabs">
+      <button class="tab active" data-target="#emp">👷 قسم الموظف (إدخال)</button>
+      <button class="tab" data-target="#admin">🧑‍💼 قسم المدير (إدارة وتقارير)</button>
+    </div>
+
+    <!-- ========================= قسم الموظف ========================= -->
+    <section id="emp" class="section active">
+      <div class="card">
+        <h2>📥 إدخال البيانات اليومية</h2>
+        <div class="muted">املأ الكميات المطلوبة لكل تبويب ثم اضغط «حفظ»</div>
+      </div>
+
+      <div class="grid cols-2">
+        <!-- إنتاج المرش -->
+        <div class="card">
+          <h3>إنتاج المرش</h3>
+          <table>
+            <thead><tr><th>#</th><th>اسم العجينة</th><th>الوحدة</th><th>الكمية</th></tr></thead>
+            <tbody id="emp-prod"></tbody>
+          </table>
+          <div style="margin-top:10px"><button class="btn save" onclick="saveTable('emp-prod','إنتاج المرش')">💾 حفظ الإنتاج</button></div>
+        </div>
+
+        <!-- تحويلات الإنتاج -->
+        <div class="card">
+          <h3>تحويلات الإنتاج</h3>
+          <table>
+            <thead><tr><th>#</th><th>اسم العجينة</th><th>الوحدة</th><th>الكمية</th></tr></thead>
+            <tbody id="emp-trans"></tbody>
+          </table>
+          <div style="margin-top:10px"><button class="btn save" onclick="saveTable('emp-trans','تحويلات الإنتاج')">💾 حفظ التحويلات</button></div>
+        </div>
+
+        <!-- استخدام المرش اليومي -->
+        <div class="card">
+          <h3>استخدام المرش اليومي</h3>
+          <table>
+            <thead><tr><th>#</th><th>المادة</th><th>الوحدة</th><th>الكمية</th></tr></thead>
+            <tbody id="emp-usage"></tbody>
+          </table>
+          <div style="margin-top:10px"><button class="btn save" onclick="saveTable('emp-usage','استخدام المرش')">💾 حفظ الاستخدام</button></div>
+        </div>
+
+        <!-- جرد المرش -->
+        <div class="card">
+          <h3>جرد المرش</h3>
+          <table>
+            <thead><tr><th>#</th><th>المادة</th><th>الوحدة</th><th>الكمية المتبقية</th></tr></thead>
+            <tbody id="emp-inv"></tbody>
+          </table>
+          <div style="margin-top:10px"><button class="btn save" onclick="saveTable('emp-inv','جرد المرش')">💾 حفظ الجرد</button></div>
+        </div>
+      </div>
+
+      <div id="emp-msg" class="card muted"></div>
+    </section>
+
+    <!-- ========================= قسم المدير ========================= -->
+    <section id="admin" class="section">
+      <div class="card">
+        <h2>📊 لوحة المدير</h2>
+        <div class="kpi" id="kpis"></div>
+        <div class="filters flex" style="margin-top:10px">
+          <label>من: <input type="date" id="fromDate"></label>
+          <label>إلى: <input type="date" id="toDate"></label>
+          <label>القسم:
+            <select id="sectionFilter">
+              <option value="الكل">الكل</option>
+              <option>إنتاج المرش</option>
+              <option>تحويلات الإنتاج</option>
+              <option>استخدام المرش</option>
+              <option>جرد المرش</option>
+              <option>إغلاق اليوم</option>
+            </select>
+          </label>
+          <button class="btn refresh" onclick="loadAll()">تحديث</button>
+          <button class="btn close" onclick="closeDay()">🔒 إغلاق اليوم</button>
+          <button class="btn print" onclick="window.print()">🖨️ طباعة</button>
+        </div>
+      </div>
+
+      <!-- جداول الأقسام -->
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>إنتاج المرش</h3>
+          <table><thead><tr><th>التاريخ</th><th>الصنف/المادة</th><th>الوحدة</th><th>الكمية</th></tr></thead><tbody id="tbl-prod"></tbody></table>
+          <div class="muted" id="sum-prod"></div>
+        </div>
+        <div class="card">
+          <h3>تحويلات الإنتاج</h3>
+          <table><thead><tr><th>التاريخ</th><th>الصنف/المادة</th><th>الوحدة</th><th>الكمية</th></tr></thead><tbody id="tbl-trans"></tbody></table>
+          <div class="muted" id="sum-trans"></div>
+        </div>
+        <div class="card">
+          <h3>استخدام المرش</h3>
+          <table><thead><tr><th>التاريخ</th><th>المادة</th><th>الوحدة</th><th>الكمية</th></tr></thead><tbody id="tbl-usage"></tbody></table>
+          <div class="muted" id="sum-usage"></div>
+        </div>
+        <div class="card">
+          <h3>جرد المرش</h3>
+          <table><thead><tr><th>التاريخ</th><th>المادة</th><th>الوحدة</th><th>الكمية</th></tr></thead><tbody id="tbl-inv"></tbody></table>
+          <div class="muted" id="sum-inv"></div>
+        </div>
+      </div>
+
+      <!-- مقارنة الجرد مقابل الاستخدام -->
+      <div class="card">
+        <h3>المقارنة اليومية: الجرد مقابل الاستخدام</h3>
+        <table>
+          <thead><tr><th>المادة</th><th>إجمالي الجرد</th><th>إجمالي الاستخدام</th><th>الفرق (جرد - استخدام)</th></tr></thead>
+          <tbody id="tbl-diff"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ========= إعدادات عامة =========
+    const SCRIPT_URL = "YOUR_SCRIPT_URL"; // <-- غيّر هذا بالرابط من Apps Script
+
+    // قوائم الأصناف/المواد
+    const doughItems = [
+      "عجينة ناعمة","عجينة خشنة","عجينة بلورية","عجينة مبرومة",
+      "عجينة رفيعة","عجينة عش البلبل","عجينة فريرة","عجينة برمة حلبي"
+    ];
+    const materialItems = [
+      "طحين شتيبل","طحين تسكرمان","طحين تركي أخضر","طحين أطلس",
+      "زيت","صبغة كنافة","ملح كنافة","ملح أوز","سمنة كرستال"
+    ];
+
+    // بناء جداول الإدخال
+    function buildInputTable(tbodyId, list){
+      const tb = document.getElementById(tbodyId);
+      tb.innerHTML = "";
+      list.forEach((name,i)=>{
+        tb.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td>${i+1}</td>
+            <td>${name}</td>
+            <td>كيلو</td>
+            <td><input type="number" min="0" step="0.1" value="0" id="${tbodyId}-q-${i}"></td>
+          </tr>
+        `);
+      });
+    }
+    buildInputTable("emp-prod", doughItems);
+    buildInputTable("emp-trans", doughItems);
+    buildInputTable("emp-usage", materialItems);
+    buildInputTable("emp-inv", materialItems);
+
+    // حفظ جدول واحد للشيت (قسم الموظف)
+    async function saveTable(tbodyId, sectionName){
+      const msg = document.getElementById("emp-msg");
+      msg.textContent = "⏳ جاري الحفظ...";
+      const list = tbodyId.includes("prod") || tbodyId.includes("trans") ? doughItems : materialItems;
+
+      for(let i=0;i<list.length;i++){
+        const qty = Number(document.getElementById(`${tbodyId}-q-${i}`).value || 0);
+        if(qty>0){
+          const payload = { item:list[i], unit:"كيلو", qty, section:sectionName };
+          await fetch(SCRIPT_URL, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify(payload)
+          });
+        }
+      }
+      msg.textContent = "✅ تم الحفظ بنجاح";
+      setTimeout(()=> msg.textContent="", 4000);
+    }
+
+    // تبويب بين الأقسام
+    document.querySelectorAll(".tab").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+        document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelector(btn.dataset.target).classList.add("active");
+      });
+    });
+
+    // ========= قسم المدير =========
+    let rawRows = []; // كل البيانات من الشيت
+
+    async function fetchSheet(){
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      return data; // مصفوفة صفوف
+    }
+
+    function withinRange(dateStr, from, to){
+      if(!from && !to) return true;
+      const d = new Date(dateStr);
+      if(from && d < new Date(from)) return false;
+      if(to && d > new Date(to+"T23:59:59")) return false;
+      return true;
+    }
+
+    function renderTable(tbodyId, rows){
+      const tb = document.getElementById(tbodyId);
+      tb.innerHTML = "";
+      rows.forEach(r=>{
+        const d = r[0] ? new Date(r[0]).toLocaleDateString() : "";
+        tb.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td>${d}</td>
+            <td>${r[1]}</td>
+            <td>${r[2]}</td>
+            <td>${r[3]}</td>
+          </tr>
+        `);
+      });
+    }
+
+    function sumQty(rows){ return rows.reduce((s,r)=> s + (Number(r[3])||0), 0); }
+
+    function updateKPIs(all){
+      const prod = all.filter(r=>r[4]==="إنتاج المرش");
+      const trans = all.filter(r=>r[4]==="تحويلات الإنتاج");
+      const usage = all.filter(r=>r[4]==="استخدام المرش");
+      const inv = all.filter(r=>r[4]==="جرد المرش");
+      const kpi = document.getElementById("kpis");
+      kpi.innerHTML = `
+        <span class="pill">✅ إجمالي الإنتاج: ${sumQty(prod)} كغ</span>
+        <span class="pill">🔄 إجمالي التحويلات: ${sumQty(trans)} كغ</span>
+        <span class="pill">🛠️ إجمالي الاستخدام: ${sumQty(usage)} كغ</span>
+        <span class="pill">📦 إجمالي الجرد: ${sumQty(inv)} كغ</span>
+      `;
+    }
+
+    function buildDiff(invRows, usageRows){
+      // نجمع حسب المادة
+      const invMap = {}, useMap = {};
+      invRows.forEach(r=> invMap[r[1]] = (invMap[r[1]]||0) + (Number(r[3])||0));
+      usageRows.forEach(r=> useMap[r[1]] = (useMap[r[1]]||0) + (Number(r[3])||0));
+
+      const allKeys = Array.from(new Set([...Object.keys(invMap), ...Object.keys(useMap)]));
+      const tb = document.getElementById("tbl-diff");
+      tb.innerHTML = "";
+      allKeys.forEach(k=>{
+        const inv = invMap[k]||0, use = useMap[k]||0, diff = inv - use;
+        const cls = diff>=0 ? "diff-ok" : "diff-bad";
+        tb.insertAdjacentHTML("beforeend", `
+          <tr class="${cls}">
+            <td>${k}</td>
+            <td>${inv}</td>
+            <td>${use}</td>
+            <td>${diff}</td>
+          </tr>
+        `);
+      });
+    }
+
+    function applyFilters(){
+      const from = document.getElementById("fromDate").value;
+      const to = document.getElementById("toDate").value;
+      const sec = document.getElementById("sectionFilter").value;
+
+      // تجاهل الهيدر
+      let rows = rawRows.slice(1).filter(r => r && r.length >= 5);
+
+      // فلترة التاريخ والقسم
+      rows = rows.filter(r => withinRange(r[0], from, to) && (sec==="الكل" || r[4]===sec));
+
+      // تقسيم حسب الأقسام
+      const prod = rows.filter(r=>r[4]==="إنتاج المرش");
+      const trans = rows.filter(r=>r[4]==="تحويلات الإنتاج");
+      const usage = rows.filter(r=>r[4]==="استخدام المرش");
+      const inv = rows.filter(r=>r[4]==="جرد المرش");
+
+      renderTable("tbl-prod", prod);
+      renderTable("tbl-trans", trans);
+      renderTable("tbl-usage", usage);
+      renderTable("tbl-inv", inv);
+
+      document.getElementById("sum-prod").textContent = `الإجمالي: ${sumQty(prod)} كغ`;
+      document.getElementById("sum-trans").textContent = `الإجمالي: ${sumQty(trans)} كغ`;
+      document.getElementById("sum-usage").textContent = `الإجمالي: ${sumQty(usage)} كغ`;
+      document.getElementById("sum-inv").textContent = `الإجمالي: ${sumQty(inv)} كغ`;
+
+      // KPI على كامل الفلترة الحالية (مش شرط قسم واحد)
+      updateKPIs(rows);
+
+      // المقارنة الجرد مقابل الاستخدام ضمن نفس مدى التاريخ
+      buildDiff(inv, usage);
+    }
+
+    async function loadAll(){
+      const msgBtn = document.querySelector('.btn.refresh');
+      msgBtn.textContent = "جارِ التحديث...";
+      const data = await fetchSheet();
+      rawRows = data;
+      applyFilters();
+      msgBtn.textContent = "تحديث";
+    }
+
+    // إغلاق اليوم = إضافة صف علامة
+    async function closeDay(){
+      if(!confirm("هل أنت متأكد من إغلاق اليوم؟ سيُضاف صف علامة في الشيت.")) return;
+      await fetch(SCRIPT_URL, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ item:"—", unit:"—", qty:0, section:"إغلاق اليوم" })
+      });
+      alert("✅ تم إغلاق اليوم وإضافة العلامة في الشيت");
+      loadAll();
+    }
+
+    // تحميل أولي للقسم الإداري عند فتحه أول مرة
+    document.querySelector('[data-target="#admin"]').addEventListener("click", ()=>{
+      if(!rawRows.length) loadAll();
+    });
+  </script>
+</body>
+</html>
